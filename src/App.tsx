@@ -8,6 +8,9 @@ function App() {
   const [zoomControl, setZoomControl] = useState(false);
   const [keyboardShortcuts, setKeyboardShortcuts] = useState(false);
 
+  const mapTypeIdList = ["normal", "terrain", "satellite", "hybrid"];
+
+  const [mapTypeId, setMapTypeId] = useState("normal");
   useEffect(() => {
     const { naver } = window;
     if (!mapElement.current || !naver) return;
@@ -23,13 +26,14 @@ function App() {
         position: naver.maps.Position.TOP_RIGHT,
       },
       draggable: draggable,
+      mapTypeId: mapTypeId,
     };
     const map = new naver.maps.Map(mapElement.current, mapOptions);
     new naver.maps.Marker({
       position: location,
       map,
     });
-  }, [draggable, zoomControl, keyboardShortcuts]);
+  }, [draggable, zoomControl, keyboardShortcuts, mapTypeId]);
 
   return (
     <MapContainer>
@@ -50,7 +54,18 @@ function App() {
         >
           keyboardShortcuts
         </Button>
+        <MapTypeIdListContainer>
+          {mapTypeIdList.map((mapTypeId) => (
+            <div onClick={() => setMapTypeId(mapTypeId)}>
+              <Button>
+                <input type="radio" name="mapTypeId" />
+                <label>{mapTypeId}</label>
+              </Button>
+            </div>
+          ))}
+        </MapTypeIdListContainer>
       </ButtonWrapper>
+
       <Map ref={mapElement} />
     </MapContainer>
   );
@@ -81,6 +96,12 @@ const Button = styled.div<{ isActive?: boolean }>`
   background: ${(props) => (props.isActive ? "#1E88E5" : "#F4F7FF")};
   color: ${(props) => (props.isActive ? "#F4F7FF" : "#1E88E5")};
   cursor: pointer;
+`;
+
+const MapTypeIdListContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default App;

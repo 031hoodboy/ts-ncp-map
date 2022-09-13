@@ -76,8 +76,10 @@ function App() {
           {mapTypeIdList.map((mapTypeId) => (
             <div onClick={() => setMapTypeId(mapTypeId)}>
               <Button>
-                <input type="radio" name="mapTypeId" />
-                <label>{mapTypeId}</label>
+                <label>
+                  <input type="radio" name="mapTypeId" />
+                  {mapTypeId}
+                </label>
               </Button>
             </div>
           ))}

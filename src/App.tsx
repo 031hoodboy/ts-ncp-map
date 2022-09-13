@@ -19,6 +19,10 @@ const App = () => {
       minZoom: 14,
       maxZoom: 14,
     },
+    location: {
+      latitude: 37.4944382,
+      longitude: 127.0126429,
+    },
   });
 
   const onIsGray = () => {
@@ -61,12 +65,22 @@ const App = () => {
     });
   };
 
+  const onLocation = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      setState((draft) => {
+        draft.location.latitude = position.coords.latitude;
+        draft.location.longitude = position.coords.longitude;
+      });
+    });
+  };
+
   const onMap = () => {
+    onLocation();
     const { naver } = window;
     if (!mapElement.current || !naver) return;
     const location = new naver.maps.LatLng(
-      37.49450980317381,
-      127.01270976617246
+      state.location.latitude,
+      state.location.longitude
     );
     const mapOptions: naver.maps.MapOptions = {
       center: location,
@@ -74,17 +88,16 @@ const App = () => {
       minZoom: state.zoom.minZoom,
       maxZoom: state.zoom.maxZoom,
       keyboardShortcuts: state.keyboardShortcuts,
-      zoomControlOptions: {
-        position: naver.maps.Position.TOP_RIGHT,
-      },
       draggable: state.draggable,
       mapTypeId: state.mapTypeId,
     };
 
     const map = new naver.maps.Map(mapElement.current, mapOptions);
-
     var marker = new naver.maps.Marker({
-      position: new naver.maps.LatLng(37.49450980317381, 127.01270976617246),
+      position: new naver.maps.LatLng(
+        state.location.latitude,
+        state.location.longitude
+      ),
       map: map,
     });
 
@@ -146,11 +159,11 @@ const Map = styled.div<{ isFilterGray?: boolean }>`
     css`
       img[src^='http://nrbe.map.naver.net/styles/']
       {
-        filter: grayscale(100);
+        filter: grayscale(50);
       }
       img[src^='https://nrbe.pstatic.net/styles/']
       {
-        filter: grayscale(100);
+        filter: grayscale(50);
       }
     `}
 `;

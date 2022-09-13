@@ -6,6 +6,7 @@ function App() {
 
   const [draggable, setDraggable] = useState(false);
   const [zoomControl, setZoomControl] = useState(false);
+  const [keyboardShortcuts, setKeyboardShortcuts] = useState(false);
 
   useEffect(() => {
     const { naver } = window;
@@ -17,6 +18,7 @@ function App() {
       center: location,
       zoom: 17,
       zoomControl,
+      keyboardShortcuts: keyboardShortcuts,
       zoomControlOptions: {
         position: naver.maps.Position.TOP_RIGHT,
       },
@@ -27,7 +29,7 @@ function App() {
       position: location,
       map,
     });
-  }, [draggable, zoomControl]);
+  }, [draggable, zoomControl, keyboardShortcuts]);
 
   return (
     <MapContainer>
@@ -41,6 +43,12 @@ function App() {
           isActive={zoomControl}
         >
           ZoomControl
+        </Button>
+        <Button
+          onClick={() => setKeyboardShortcuts(!keyboardShortcuts)}
+          isActive={keyboardShortcuts}
+        >
+          keyboardShortcuts
         </Button>
       </ButtonWrapper>
       <Map ref={mapElement} />

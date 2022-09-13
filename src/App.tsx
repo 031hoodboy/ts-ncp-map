@@ -46,7 +46,7 @@ const App = () => {
     });
   };
 
-  useEffect(() => {
+  const onMap = () => {
     const { naver } = window;
     if (!mapElement.current || !naver) return;
 
@@ -76,6 +76,11 @@ const App = () => {
     naver.maps.Event.addListener(map, "click", function (e) {
       marker.setPosition(e.latlng);
     });
+  };
+
+  useEffect(() => {
+    onMap();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (

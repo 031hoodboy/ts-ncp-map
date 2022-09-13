@@ -11,9 +11,14 @@ const App = () => {
   const [state, setState] = useImmer({
     isGray: false,
     draggable: false,
-    zoomControl: false,
     keyboardShortcuts: false,
     mapTypeId: "normal",
+    zoom: {
+      state: false,
+      zoom: 14,
+      minZoom: 14,
+      maxZoom: 14,
+    },
   });
 
   const onIsGray = () => {
@@ -28,15 +33,25 @@ const App = () => {
     });
   };
 
-  const onZoomControl = () => {
-    setState((draft) => {
-      draft.zoomControl = !draft.zoomControl;
-    });
-  };
-
   const onKeyboardShortcuts = () => {
     setState((draft) => {
       draft.keyboardShortcuts = !draft.keyboardShortcuts;
+    });
+  };
+
+  const onZoom = () => {
+    setState((draft) => {
+      if (!draft.zoom.state) {
+        draft.zoom.zoom = 14;
+        draft.zoom.minZoom = 10;
+        draft.zoom.maxZoom = 21;
+        draft.zoom.state = !draft.zoom.state;
+      } else {
+        draft.zoom.zoom = 14;
+        draft.zoom.minZoom = 14;
+        draft.zoom.maxZoom = 14;
+        draft.zoom.state = !draft.zoom.state;
+      }
     });
   };
 
@@ -49,15 +64,15 @@ const App = () => {
   const onMap = () => {
     const { naver } = window;
     if (!mapElement.current || !naver) return;
-
     const location = new naver.maps.LatLng(
       37.49450980317381,
       127.01270976617246
     );
     const mapOptions: naver.maps.MapOptions = {
       center: location,
-      zoom: 14,
-      zoomControl: state.zoomControl,
+      zoom: state.zoom.zoom,
+      minZoom: state.zoom.minZoom,
+      maxZoom: state.zoom.maxZoom,
       keyboardShortcuts: state.keyboardShortcuts,
       zoomControlOptions: {
         position: naver.maps.Position.TOP_RIGHT,
@@ -65,7 +80,7 @@ const App = () => {
       draggable: state.draggable,
       mapTypeId: state.mapTypeId,
     };
-    console.log(mapOptions.zoom?.toExponential);
+
     const map = new naver.maps.Map(mapElement.current, mapOptions);
 
     var marker = new naver.maps.Marker({
@@ -90,14 +105,14 @@ const App = () => {
         <Button onClick={onDraggable} isActive={state.draggable}>
           Draggable
         </Button>
-        <Button onClick={onZoomControl} isActive={state.zoomControl}>
-          ZoomControl
-        </Button>
         <Button
           onClick={onKeyboardShortcuts}
           isActive={state.keyboardShortcuts}
         >
           keyboardShortcuts
+        </Button>
+        <Button onClick={onZoom} isActive={state.zoom.state}>
+          zoom
         </Button>
         <Button onClick={onIsGray} isActive={state.isGray}>
           isGray

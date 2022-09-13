@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useRef } from "react";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const mapElement = useRef(null);
+
+  useEffect(() => {
+    const { naver } = window;
+    if (!mapElement.current || !naver) return;
+
+    // 지도에 표시할 위치의 위도와 경도 좌표를 파라미터로 넣어줍니다.
+    const location = new naver.maps.LatLng(37.5656, 126.9769);
+    const mapOptions: naver.maps.MapOptions = {
+      center: location,
+      zoom: 17,
+      zoomControl: true,
+      zoomControlOptions: {
+        position: naver.maps.Position.TOP_RIGHT,
+      },
+    };
+    const map = new naver.maps.Map(mapElement.current, mapOptions);
+    new naver.maps.Marker({
+      position: location,
+      map,
+    });
+  }, []);
+
+  return <div ref={mapElement} style={{ minHeight: "600px" }} />;
 }
 
 export default App;

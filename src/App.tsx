@@ -1,19 +1,43 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import { useImmer } from "use-immer";
 
 function App() {
   const mapElement = useRef(null);
 
-  const [isGray, setIsGray] = useState(false);
-
-  const [draggable, setDraggable] = useState(false);
-  const [zoomControl, setZoomControl] = useState(false);
-  const [keyboardShortcuts, setKeyboardShortcuts] = useState(false);
-
   const mapTypeIdList = ["normal", "terrain", "satellite", "hybrid"];
 
   const [mapTypeId, setMapTypeId] = useState("normal");
+
+  const [state, setState] = useImmer({
+    isGray: false,
+    draggable: false,
+    zoomControl: false,
+    keyboardShortcuts: false,
+  });
+
+  const onIsGray = () => {
+    setState((draft) => {
+      draft.isGray = !draft.isGray;
+    });
+  };
+
+  const onDraggable = () => {
+    setState((draft) => {
+      draft.draggable = !draft.draggable;
+    });
+  };
+  const onZoomControl = () => {
+    setState((draft) => {
+      draft.zoomControl = !draft.zoomControl;
+    });
+  };
+  const onKeyboardShortcuts = () => {
+    setState((draft) => {
+      draft.keyboardShortcuts = !draft.keyboardShortcuts;
+    });
+  };
 
   useEffect(() => {
     const { naver } = window;
@@ -27,14 +51,12 @@ function App() {
     const mapOptions: naver.maps.MapOptions = {
       center: location,
       zoom: 14,
-      // maxZoom: 14,
-      // minZoom: 14,
-      zoomControl,
-      keyboardShortcuts: keyboardShortcuts,
+      zoomControl: state.zoomControl,
+      keyboardShortcuts: state.keyboardShortcuts,
       zoomControlOptions: {
         position: naver.maps.Position.TOP_RIGHT,
       },
-      draggable: draggable,
+      draggable: state.draggable,
       mapTypeId: mapTypeId,
     };
     console.log(mapOptions.zoom?.toExponential);
@@ -48,28 +70,25 @@ function App() {
     naver.maps.Event.addListener(map, "click", function (e) {
       marker.setPosition(e.latlng);
     });
-  }, [draggable, zoomControl, keyboardShortcuts, mapTypeId]);
+  }, [state]);
 
   return (
     <MapContainer>
       <Title>ts-ncp-map</Title>
       <ButtonWrapper>
-        <Button onClick={() => setDraggable(!draggable)} isActive={draggable}>
+        <Button onClick={onDraggable} isActive={state.draggable}>
           Draggable
         </Button>
-        <Button
-          onClick={() => setZoomControl(!zoomControl)}
-          isActive={zoomControl}
-        >
+        <Button onClick={onZoomControl} isActive={state.zoomControl}>
           ZoomControl
         </Button>
         <Button
-          onClick={() => setKeyboardShortcuts(!keyboardShortcuts)}
-          isActive={keyboardShortcuts}
+          onClick={onKeyboardShortcuts}
+          isActive={state.keyboardShortcuts}
         >
           keyboardShortcuts
         </Button>
-        <Button onClick={() => setIsGray(!isGray)} isActive={isGray}>
+        <Button onClick={onIsGray} isActive={state.isGray}>
           isGray
         </Button>
         <MapTypeIdListContainer>
@@ -86,7 +105,7 @@ function App() {
         </MapTypeIdListContainer>
       </ButtonWrapper>
 
-      <Map ref={mapElement} isFilterGray={isGray} />
+      <Map ref={mapElement} isFilterGray={state.isGray} />
     </MapContainer>
   );
 }

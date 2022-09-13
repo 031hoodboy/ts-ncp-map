@@ -1,20 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { useImmer } from "use-immer";
 
-function App() {
+const MAP_TYPE_ID_LIST = ["normal", "terrain", "satellite", "hybrid"];
+
+const App = () => {
   const mapElement = useRef(null);
-
-  const mapTypeIdList = ["normal", "terrain", "satellite", "hybrid"];
-
-  const [mapTypeId, setMapTypeId] = useState("normal");
 
   const [state, setState] = useImmer({
     isGray: false,
     draggable: false,
     zoomControl: false,
     keyboardShortcuts: false,
+    mapTypeId: "normal",
   });
 
   const onIsGray = () => {
@@ -28,14 +27,22 @@ function App() {
       draft.draggable = !draft.draggable;
     });
   };
+
   const onZoomControl = () => {
     setState((draft) => {
       draft.zoomControl = !draft.zoomControl;
     });
   };
+
   const onKeyboardShortcuts = () => {
     setState((draft) => {
       draft.keyboardShortcuts = !draft.keyboardShortcuts;
+    });
+  };
+
+  const onMapTypeId = (e: any) => {
+    setState((draft) => {
+      draft.mapTypeId = `${e}`;
     });
   };
 
@@ -43,7 +50,6 @@ function App() {
     const { naver } = window;
     if (!mapElement.current || !naver) return;
 
-    // 지도에 표시할 위치의 위도와 경도 좌표를 파라미터로 넣어줍니다.
     const location = new naver.maps.LatLng(
       37.49450980317381,
       127.01270976617246
@@ -57,7 +63,7 @@ function App() {
         position: naver.maps.Position.TOP_RIGHT,
       },
       draggable: state.draggable,
-      mapTypeId: mapTypeId,
+      mapTypeId: state.mapTypeId,
     };
     console.log(mapOptions.zoom?.toExponential);
     const map = new naver.maps.Map(mapElement.current, mapOptions);
@@ -92,15 +98,13 @@ function App() {
           isGray
         </Button>
         <MapTypeIdListContainer>
-          {mapTypeIdList.map((mapTypeId) => (
-            <div onClick={() => setMapTypeId(mapTypeId)}>
-              <Button>
-                <label>
-                  <input type="radio" name="mapTypeId" />
-                  {mapTypeId}
-                </label>
-              </Button>
-            </div>
+          {MAP_TYPE_ID_LIST.map((mapTypeId) => (
+            <Button onClick={() => onMapTypeId(mapTypeId)}>
+              <label>
+                <input type="radio" name="mapTypeId" />
+                {mapTypeId}
+              </label>
+            </Button>
           ))}
         </MapTypeIdListContainer>
       </ButtonWrapper>
@@ -108,7 +112,7 @@ function App() {
       <Map ref={mapElement} isFilterGray={state.isGray} />
     </MapContainer>
   );
-}
+};
 
 const MapContainer = styled.div`
   padding: 50px;
